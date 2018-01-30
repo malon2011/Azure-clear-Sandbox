@@ -14,7 +14,7 @@ Else{
     New-Item -ItemType file -Path ("$Exportpath\$SubscriptionID\" + $date + ".json") -Force
     }
 $Whitelist = Get-content $Subscriptionlist
-If ($SubscriptionID -in $Whitelist){
+If ($SubscriptionID = "6bd9f077-ad10-4be0-a641-f8511e588d65"){
     Get-AzureRmResource -ExpandProperties | convertto-json | out-file -FilePath ("$Exportpath\$SubscriptionID\" + $date + ".json")
     $ResourceGroups = Get-AzureRmResourceGroup -Location $Region #| Select-Object -Property ResourceID
     Foreach($ResourceGroup in $ResourceGroups){
