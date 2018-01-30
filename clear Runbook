@@ -1,0 +1,23 @@
+param (
+    [Parameter (Mandatory = $true)]$SubscriptionID = "0d5adaa9-7c9c-4884-9e08-45ce06b4ee71",
+    $Region = "West-europe",
+    $Subscriptionlist = "C:\Users\Saskia\Documents\Sandbox Automation\Sandboxes.txt",
+    $Exportpath = "C:\Users\Saskia\Documents\Sandbox Automation"
+    )
+#Login-AzureRmAccount -SubscriptionId $SubscriptionID
+$date = ("{0:d4}-{1:d2}-{2:d2}" -f (Get-Date).Year,(Get-Date).Month,(Get-Date).Day)
+If  (Test-Path "$Exportpath\$SubscriptionID"){
+    New-Item -ItemType file -Path ("$Exportpath\$SubscriptionID\" + $date + ".json") -Force
+    }
+Else{
+    New-Item -ItemType directory -Path "$Exportpath\$SubscriptionID\" -Force
+    New-Item -ItemType file -Path ("$Exportpath\$SubscriptionID\" + $date + ".json") -Force
+    }
+$Whitelist = Get-content $Subscriptionlist
+If ($SubscriptionID -in $Whitelist){
+    Get-AzureRmResource -ExpandProperties | convertto-json | out-file -FilePath ("$Exportpath\$SubscriptionID\" + $date + ".json")
+    $ResourceGroups = Get-AzureRmResourceGroup -Location $Region #| Select-Object -Property ResourceID
+    Foreach($ResourceGroup in $ResourceGroups){
+        $Resourcegroup | Remove-AzureRmResourceGroup -force
+    }
+}
